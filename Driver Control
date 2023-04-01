@@ -1,0 +1,268 @@
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/*    Module:       main.cpp                                                  */
+/*    Author:       VEX                                                       */
+/*    Created:      Thu Sep 26 2019                                           */
+/*    Description:  Competition Template                                      */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// CatRot               rotation      2               
+// Catapult             motor         1               
+// Controller1          controller                    
+// Intake               motor         5               
+// FrontLeft            motor         12              
+// Extension            digital_out   A               
+// FrontRight           motor         10              
+// BackLeft             motor         13              
+// BackRight            motor         9               
+// MiddleLeft           motor         11              
+// MiddleRight          motor         20              
+// ---- END VEXCODE CONFIGURED DEVICES ----
+
+#include "vex.h"
+
+using namespace vex;
+
+// A global instance of competition
+competition Competition;
+
+// define your global instances of motors and other devices here
+
+bool q;
+float driveV;
+
+/*---------------------------------------------------------------------------*/
+/*                          Pre-Autonomous Functions                         */
+/*                                                                           */
+/*  You may want to perform some actions before the competition starts.      */
+/*  Do them in the following function.  You must return from this function   */
+/*  or the autonomous and usercontrol tasks will not be started.  This       */
+/*  function is only called once after the V5 has been powered on and        */
+/*  not every time that the robot is disabled.                               */
+/*---------------------------------------------------------------------------*/
+
+void pre_auton(void) {
+  // Initializing Robot Configuration. DO NOT REMOVE!
+  vexcodeInit();
+
+  // All activities that occur before the competition starts
+  // Example: clearing encoders, setting servo positions, ...
+}
+
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*                              Autonomous Task                              */
+/*                                                                           */
+/*  This task is used to control your robot during the autonomous phase of   */
+/*  a VEX Competition.                                                       */
+/*                                                                           */
+/*  You must modify the code to add your own robot specific commands here.   */
+/*---------------------------------------------------------------------------*/
+
+void autonomous(void) {
+  // ..........................................................................
+  // Insert autonomous user code here.
+  // ..........................................................................
+}
+
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*                              User Control Task                            */
+/*                                                                           */
+/*  This task is used to control your robot during the user control phase of */
+/*  a VEX Competition.                                                       */
+/*                                                                           */
+/*  You must modify the code to add your own robot specific commands here.   */
+/*---------------------------------------------------------------------------*/
+// CatRot.position(degrees)<3||CatRot.position(degrees)>300.20mmmmmmmmif (Controller1.ButtonR1.pressing(){CatRot.position(degrees)<300||CatRot.position(degrees)>3.20
+void shoot() {
+  Catapult.spinFor(forward, 540, deg);
+  // Catapult.spin(forward);
+}
+void intake() {
+  // if (Controller1.ButtonL2.pressing()){
+  //     if (q == true){
+  //       Intake.stop();
+  //     }else{
+  //       driveV = 0.5;
+  //       Intake.spin(forward, 100, percent);
+  //     }
+
+  //   }else if (Controller1.ButtonL1.pressing()){
+  //     Intake.spin(reverse, 100, percent);
+  //     driveV = 1;
+  //   }else{
+  //     Intake.stop();
+  //     driveV = 1;
+  //   }
+  Intake.spin(forward, 100, percent);
+
+} 
+void extension() {
+  Extension.set(true);
+}
+// void drive() {
+//     float a = Controller1.Axis2.position(percent);
+//     float b = Controller1.Axis3.position(percent);
+
+//     FrontLeft.spin(forward, a, percent);
+//     FrontRight.spin(forward, b, percent);
+//     BackLeft.spin(forward, a, percent);
+//     BackRight.spin(forward,b, percent);
+//     MiddleLeft.spin(forward, a, percent);
+//     MiddleRight.spin(forward, b, percent);
+// }
+void shoot1 (){
+   //print(CatRot);
+    // System.out.println(CatRot.position(degrees));
+    // Catapult.setRotation(0, degrees);
+  
+    while(Controller1.ButtonR1.pressing() && Catapult.position(deg)<50) {
+        Catapult.spin(forward);
+        waitUntil(Catapult.position(degrees) >= 50); // wait until the catapult reaches the maximum shooting position
+        Catapult.stop();
+        // shoot();
+    }
+    // i
+  // if (Catapult.position(deg)>300) {
+    //   Catapult.setPosition(3,turns);
+    //   Catapult.stop();
+    // }
+    Controller1.Screen.print(Catapult.position(turns));
+      
+    // float a = Controller1.Axis2.position(percent);
+    // float b = Controller1.Axis3.position(percent);
+
+    // FrontLeft.spin(forward, a, percent);
+    // FrontRight.spin(forward, b, percent);
+    // BackLeft.spin(forward, a, percent);
+    // BackRight.spin(forward,b, percent);
+    // MiddleLeft.spin(forward, a, percent);
+    // MiddleRight.spin(forward, b, percent);
+    // // if (Controller1.ButtonB.pressing()){
+    //   Extension.set(true);
+    // }
+    // if (Catapult.rotation(deg)>299) {
+
+    Catapult.stop();
+}
+
+ 
+
+// void retract(){
+//   while(CatRot.position(degrees)>1){
+//     Catapult.spin(forward);
+//     float a = Controller1.Axis2.position(percent);
+//     float b = Controller1.Axis3.position(percent);
+
+//     FrontLeft.spin(forward, a, percent);
+//     FrontRight.spin(forward, b, percent);
+//     BackLeft.spin(forward, a, percent);
+//     BackRight.spin(forward,b, percent);
+//     MiddleLeft.spin(forward, a, percent);
+//     MiddleRight.spin(forward, b, percent);
+//     if (Controller1.ButtonB.pressing()){
+//       Extension.set(true);
+//     }
+
+//   }
+//   Catapult.stop();
+
+
+// void move(){
+//   shoot();
+//   wait(10,msec);
+//   retract();
+// }
+
+// void dcf(){
+//   q = true;
+//   move();
+//   q = false;
+// }
+// //Inta
+// void handleIntake(){
+
+//     if (Controller1.ButtonL2.pressing()){
+//       if (q == true){
+//         Intake.stop();
+//       }else{
+//         driveV = 0.5;
+//         Intake.spin(forward, 100, percent);
+//       }
+
+//     }else if (Controller1.ButtonL1.pressing()){
+//       Intake.spin(reverse, 100, percent);
+//       driveV = 1;
+//     }else{
+//       Intake.stop();
+//       driveV = 1;
+//     }
+
+//     //Catapult
+//     if (Controller1.ButtonR1.pressing()){
+//       dcf();
+//     }
+//     //Extend
+//     if (Controller1.ButtonB.pressing()){
+//       Extension.set(true);
+//     }
+// }
+
+
+
+void usercontrol() {
+  while(1){
+    {
+      shoot1();
+    }
+    // Controller1.ButtonR1.pressed(shoot);
+    Controller1.ButtonL2.pressed(intake);
+    if (Controller1.ButtonR2.pressing()){
+      break;
+    }
+    Controller1.ButtonL1.pressed(extension);
+    FrontLeft.spin(fwd,Controller1.Axis3.position(), pct);
+    BackLeft.spin(fwd,Controller1.Axis3.position(), pct);
+    MiddleLeft.spin(forward,Controller1.Axis3.position(), pct);
+    FrontRight.spin(fwd,Controller1.Axis3.position(), pct);
+    BackRight.spin(fwd,Controller1.Axis3.position(), pct);
+    MiddleRight.spin(forward,Controller1.Axis3.position(), pct);
+    
+    
+  }
+
+
+   //retract();
+    
+  
+      
+
+  
+    wait(20, msec); // Sleep the task for a short amount of time to
+    
+  }
+   
+    
+                             // prevent wasted resources.
+
+//
+// Main will set up the competition functions and callbacks.
+//
+int main() {
+  // Set up callbacks for autonomous and driver control periods.
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
+
+  // Run the pre-autonomous function.
+  pre_auton();
+
+  // Prevent main from exiting with an infinite loop.
+  while (true) {
+    wait(100, msec);
+  }
+}
