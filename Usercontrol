@@ -1,0 +1,134 @@
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/*    Module:       main.cpp                                                  */
+/*    Author:       C:\Users\Edward                                           */
+/*    Created:      Sat Apr 01 2023                                           */
+/*    Description:  V5 project                                                */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// CataRot              rotation      2               
+// CataMotor            motor         1               
+// Controller1          controller                    
+// Motor5               motor         5               
+// FrontLeft            motor         12              
+// FrontRight           motor         10              
+// MiddleLeft           motor         11              
+// MiddleRight          motor         20              
+// BackLeft             motor         13              
+// BackRight            motor         9               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+//  FrontLeft            motor         12              
+// Extension            digital_out   A               
+// FrontRight           motor         10              
+// BackLeft             motor         13              
+// BackRight            motor         9               
+// MiddleLeft           motor         11              
+// MiddleRight          motor         20 
+
+#include "vex.h"
+#include <iostream>
+
+using namespace vex;
+
+//const int GEAR_RATIO = 7;
+const int CATA_RETRACT_ANGLE = 55;
+const int SMALL_RETRACT_ANGLE = 15;
+
+bool cataOn = false;
+bool reachedTop = false;
+
+bool isUp() {
+  return CataRot.angle() < CATA_RETRACT_ANGLE;
+}
+void intake() {
+  Motor5.spin(forward);
+}
+
+void cataLaunch() {
+  while (CataRot.angle() < CATA_RETRACT_ANGLE - SMALL_RETRACT_ANGLE) {
+    CataMotor.spin(forward);
+    wait(10, msec);
+  }
+
+  CataMotor.stop();
+}
+void drive(){
+  FrontLeft.spin(fwd,Controller1.Axis3.position(), pct);
+  BackLeft.spin(fwd,Controller1.Axis3.position(), pct);
+  MiddleLeft.spin(forward,Controller1.Axis3.position(), pct);
+  FrontRight.spin(fwd,Controller1.Axis3.position(), pct);
+  BackRight.spin(fwd,Controller1.Axis3.position(), pct);
+  MiddleRight.spin(forward,Controller1.Axis3.position(), pct);
+}
+
+int main() {
+  vexcodeInit();
+
+  // Controller1.ButtonL1.pressed(cataLaunch);
+  int countr= 2;
+  int countrChecker=2;
+
+  while (true) {
+    
+    if (Controller1.ButtonL1.pressing()) {
+      cataOn = true;
+      reachedTop = false;
+      Controller1.Screen.print("e");
+    }
+    if (Controller1.ButtonL2.pressing()) {
+      if(countr % 2 == 0){
+      //intake();
+      Motor5.setVelocity(100,pct);
+      Motor5.spin(forward);
+      
+      countr+=1;
+      std::cout << countr << "<-->  " << countrChecker << "\n"; 
+        if (countr>countrChecker+1){
+          countr=countrChecker+1;
+          countrChecker = countr;
+        }
+        wait(50,msec);  
+      }
+
+      else {
+        
+        countr+=1;
+        std::cout << countr << "<-->  " << countrChecker << "\n"; 
+        if (countr>countrChecker+1){
+          countr=countrChecker+1;
+          countrChecker = countr;
+        }
+        Motor5.stop();
+        wait(50,msec);
+      }
+    }
+    // std::cout << "countr = " << countr << "\n";
+    // printf("%f", CataRot.angle());
+    // printf("  ");
+    // std::cout << cataOn;
+    // printf("  ");
+    // std::cout << reachedTop;
+    // printf("\n");
+    if (cataOn) {
+      CataMotor.spin(forward, 100, rpm);
+      if (CataRot.angle() < 20) {
+        reachedTop = true;
+      }
+      if (reachedTop && CataRot.angle() > 57 && CataRot.angle() < 100) {
+        cataOn = false;
+        reachedTop = false;
+      }
+    } else if (Controller1.ButtonR1.pressing()) {
+      CataMotor.spin(forward, 50, rpm);
+    } else {
+      CataMotor.stop();
+    }
+    drive();
+    wait(20, msec);
+    
+  }
+}
