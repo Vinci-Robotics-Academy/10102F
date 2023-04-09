@@ -1,0 +1,95 @@
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/*    Module:       main.cpp                                                  */
+/*    Author:       C:\Users\Edward                                           */
+/*    Created:      Sat Apr 08 2023                                           */
+/*    Description:  V5 project                                                */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// Motor                motor         1               
+// Rotation             rotation      2               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+
+#include "vex.h"
+#include <cmath>
+
+const float PI = 3.1415926;
+const float THRESH = 10;
+
+const float wheelDiameter = 3.25;
+const float KP = 1;
+const float KI = 0.0;
+const float KD = 0.00;
+
+float calculateTime(float rotations, float distanceInInches) { // > seconds
+  return (distanceInInches / (rotations * wheelDiameter * PI)) * 60.0;
+}
+
+void PID(float rotations, float distanceInInches) {
+  float calculatedTime = calculateTime(rotations, distanceInInches);
+
+  // Timers used.
+  timer deltaTimeTimer;
+  timer totalTimeTimer;
+
+  Rotation.resetPosition();
+
+  float integralSum = 0;
+  float lastError = 0;
+
+  while (totalTimeTimer.time(sec) < calculatedTime) {
+    float dt = deltaTimeTimer.time(sec);
+
+    // We use absolute value because we don't care
+    // about which direction the rotation sensor
+    // goes.
+    float error = rotations - fabs(Rotation.velocity(rpm));
+
+    // This is the proportional part.
+    float prop = KP * error;
+
+    // This is the integral part.
+    integralSum += error * dt;
+    float integ = KI * integralSum;
+
+    if (fabs(error) < THRESH) {
+      Motor.stop();
+      return;
+    }
+
+    // This is the derivative part.
+    float deriv = KD * (error - lastError) / dt;
+    lastError = error;
+
+    // Spin the motor.
+    float finalMotorSpeed = prop + integ + deriv;
+    Motor.spin(forward, finalMotorSpeed, rpm);
+
+    // Display extra information.
+    Brain.Screen.clearScreen();
+    Brain.Screen.printAt(10, 40, "Error: %f", error);
+    Brain.Screen.printAt(10, 60, "Rotation Velocity: %f", Rotation.velocity(rpm));
+    Brain.Screen.printAt(10, 80, "Proportional contribution: %f", prop);
+    Brain.Screen.printAt(10, 100, "Integral contribution: %f", integ);
+    Brain.Screen.printAt(10, 120, "Derivative contribution: %f", deriv);
+    Brain.Screen.render();
+
+    // The delay between the two calls is the delta time.
+    deltaTimeTimer.clear();
+
+    wait(10, msec);
+  }
+  
+  Motor.stop();
+}
+
+int main() {
+  vexcodeInit();
+
+  // Testing.
+  PID(100, 20);
+}
